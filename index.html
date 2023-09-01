@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Meter Monitoring</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/gaugeJS/dist/gauge.min.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Energy Meter Monitoring</h1>
+    </header>
+    <main>
+        <section id="data-section">
+            <h2>Energy Meter Data</h2>
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Voltage (V)</th>
+                        <th>Current (A)</th>
+                        <th>Power (W)</th>
+                        <th>PowerFactor</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <!-- Data will be displayed here -->
+                </tbody>
+            </table>
+        </section>
+        <section id="gauge-section">
+            <h2>Energy Meter Gauges</h2>
+            <table id="gauge-table">
+                <tbody id="gauge-table-body">
+                    <tr>
+                        <td><canvas id="gauge1"></canvas></td>
+                        <td><canvas id="gauge2"></canvas></td>
+                        <td><canvas id="gauge3"></canvas></td>
+                    </tr>
+                    <tr>
+                        <td><canvas id="gauge4"></canvas></td>
+                        <td><canvas id="gauge5"></canvas></td>
+                        <td><canvas id="gauge6"></canvas></td>
+                    </tr>
+                    <tr>
+                        <td><canvas id="gauge7"></canvas></td>
+                        <td><canvas id="gauge8"></canvas></td>
+                        <td><canvas id="gauge9"></canvas></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <script src="script.js" defer></script>
+    <script>
+    // Function to fetch energy meter data from an API
+    async function fetchEnergyMeterData() {
+        try {
+            const response = await fetch('YOUR_API_ENDPOINT'); // Replace with your actual API endpoint
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            return [];
+        }
+    }
+    // Function to update the table with fetched data
+    async function updateTableWithApiData() {
+        try {
+            const data = await fetchEnergyMeterData();
+            updateTable(data);
+        } catch (error) {
+            console.error('Error updating table:', error);
+        }
+    }
+    function updateTable(data) {
+        const tableBody = document.getElementById("data-table-body");
+        const fragment = document.createDocumentFragment(); // Create a document fragment for efficient DOM manipulation
+        data.forEach(entry => {
+            const row = document.createElement("tr");
+            for (const key in entry) {
+                if (key !== "timestamp") { // Skip the "timestamp" column
+                    const cell = document.createElement("td");
+                    cell.textContent = entry[key];
+                    row.appendChild(cell);
+                } else {
+                    const timestampCell = document.createElement("td");
+                    timestampCell.textContent = entry[key];
+                    row.appendChild(timestampCell);
+                }
+            }
+            fragment.appendChild(row); // Append the row to the fragment
+        });
+        tableBody.innerHTML = ""; // Clear the table body content
+        tableBody.appendChild(fragment); // Append the fragment to the table body
+    }
+    </script>
+    <script>
+    function createGauge(target, value) {
+        var opts = {
+            angle: -0.21,
+            lineWidth: 0.21,
+            radiusScale: 1,
+            pointer: {
+                length: 0.7,
+                strokeWidth: 0.075,
+                color: '#000000'
+            },
+            limitMax: false,
+            limitMin: false,
+            colorStart: '#29CFCF',
+            colorStop: '#DA441F',
+            strokeColor: '#3CE0CA',
+            generateGradient: true,
+            highDpiSupport: true,
+            renderTicks: {
+                divisions: 5,
+                divWidth: 2.5,
+                divLength: 0.88,
+                divColor: '#330903',
+                subDivisions: 3,
+                subLength: 0.36,
+                subWidth: 1.8,
+                subColor: '#18660C'
+            }
+        };
+        var gauge = new Gauge(target).setOptions(opts);
+        gauge.maxValue = 3000;
+        gauge.setMinValue(0);
+        gauge.animationSpeed = 100; // Adjusted animation speed
+        gauge.set(value);
+    }
+    // Create gauges
+    const gauge1 = document.getElementById("gauge1");
+    createGauge(gauge1, 0);
+    const gauge2 = document.getElementById("gauge2");
+    createGauge(gauge2, 0);
+    const gauge3 = document.getElementById("gauge3");
+    createGauge(gauge3, 0);
+    const gauge4 = document.getElementById("gauge4");
+    createGauge(gauge4, 0);
+    const gauge5 = document.getElementById("gauge5");
+    createGauge(gauge5, 0);
+    const gauge6 = document.getElementById("gauge6");
+    createGauge(gauge6, 0);
+    const gauge7 = document.getElementById("gauge7");
+    createGauge(gauge7, 0);
+    const gauge8 = document.getElementById("gauge8");
+    createGauge(gauge8, 0);
+    const gauge9 = document.getElementById("gauge9");
+    createGauge(gauge9, 0);
+    updateTableWithApiData();
+    </script>
+</body>
+</html>
